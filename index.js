@@ -6,6 +6,8 @@ const userRoute = require("./routes/user");
 const authRoute = require("./routes/auth");
 const productRoute = require("./routes/product");
 const orderRoute = require("./routes/order");
+const cors = require("cors");
+app.use(cors());
 
 dotenv.config();
 
