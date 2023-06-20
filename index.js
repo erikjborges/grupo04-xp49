@@ -5,6 +5,7 @@ const dotenv = require("dotenv");
 const userRoute = require("./routes/user");
 const authRoute = require("./routes/auth");
 const productRoute = require("./routes/product");
+const bannerRoute = require("./routes/banner");
 const orderRoute = require("./routes/order");
 const cors = require("cors");
 app.use(cors());
@@ -22,6 +23,7 @@ mongoose
   app.use("/api/users", userRoute);
   app.use("/api/auth", authRoute);
  app.use("/api/products", productRoute);
+ app.use("/api/banners", bannerRoute);
   app.use("/api/orders", orderRoute);
 
 app.listen(process.env.PORT || 5000, () => {
