@@ -48,38 +48,30 @@ router.get("/:id", verifyTokenAndAdmin, async (req, res) => {
 //GET ALL USER
 router.get("/", verifyTokenAndAdmin, async (req, res) => {
 
-//     //PAGINAÇÃO
-//     const {page = 1} = req.query;
-//     console.log(page);
+    //PAGINAÇÃO
+    const {page = 1, limit = 5} = req.query;
 
-//     //LIMITE DE REGISTROS POR PAGINA
-//     const limit = 5;
 
-//     //VARIÁVEL COM O NÚMERO DA PÁGINA
-// var lastPage = 1;
+//CONTAR A QUANTIDADE DE REGISTROS NO BANCO DE DADOS
+const countItem = await User.count();
 
-// //CONTAR A QUANTIDADE DE REGISTROS NO BANCO DE DADOS
-// const countUser = await User.count();
-// console.log(countUser);
+if(countItem !== 0){
+//CALCULA A ÚLTIMA PÁGINA
+lastPage = Math.ceil(countItem / limit);
+} else {
+    //PAUSA O PROCESSAMENTO E RETORNA MENSAGEM DE ERRO
+    return res.status(400).json("Error: Not users found!")
+}
 
-// if(countUser !== 0){
-// //CALCULA A ÚLTIMA PÁGINA
-// lastPage = Math.ceil(countUser / limit);
-// console.log(lastPage);
-// } else {
-//     //PAUSA O PROCESSAMENTO E RETORNA MENSAGEM DE ERRO
-//     return res.status(400).json("Error: Not users found!")
-// }
-// console.log((page * limit) - limit);
-// //CALCULAR A PARTIR DE QUAL REGISTRO DEVE RETORNAR O LIMITE DE REGISTROS
-// offset: Number((page * limit) - limit);
+//CALCULAR A PARTIR DE QUAL REGISTRO DEVE RETORNAR O LIMITE DE REGISTROS
+const offset = Number((page * limit) - limit);
+    
 
-    const query = req.query.new;
     try {
-        const users = query
-            ? await User.find().sort({ _id: -1 }).limit(5)
-            : await User.find();
-        res.status(200).json(users);
+       
+        const users = await User.find().sort({ _id: -1 }).limit(limit).skip(offset);
+    
+        res.status(200).json({totalPages: lastPage, currentPage: page, totalItems: countItem, users});
     } catch (err) {
         res.status(500).json(err);
     }

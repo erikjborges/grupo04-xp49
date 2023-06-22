@@ -44,6 +44,16 @@ router.delete("/:id", verifyTokenAndAdmin, async (req, res) => {
     };
 });
 
+//GET PRODUCT
+router.get("/:id", async (req, res) => {
+    try {
+        const categories = await Categories.findById(req.params.id);
+        res.status(200).json(categories);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
+
 
 //GET ALL CATEGORIES
 router.get("/", async (req, res) => {
