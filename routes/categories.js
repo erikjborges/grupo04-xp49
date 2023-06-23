@@ -57,23 +57,38 @@ router.get("/:id", async (req, res) => {
 
 //GET ALL CATEGORIES
 router.get("/", async (req, res) => {
-    const qNew = req.query.new;
+    const {page = 1, limit = 5} = req.query;
     const qCategory = req.query.Category;
+     //CONTAR A QUANTIDADE DE REGISTROS NO BANCO DE DADOS
+     let countItem;
+     if(qCategory){
+         countItem = await Product.count({
+             categories: qCategory
+         });
+     }else{
+         countItem = await Categories.count({
+         
+         });
+     }
+ //CALCULA A ÚLTIMA PÁGINA
+ lastPage = Math.ceil(countItem / limit);
+ //CALCULAR A PARTIR DE QUAL REGISTRO DEVE RETORNAR O LIMITE DE REGISTROS
+const offset = Number((page * limit) - limit);
+
     try {
         let categories;
-        if (qNew) {
-            categories = await Categories.find().sort({ createdAt: -1 }).limit(5);
-        } else if (qCategory) {
+        if (qCategory) {
             categories = await Categories.find({
                 categories: {
                     $in: [qCategory],
-                },
-            });
+                },                
+            }).sort({ _id: -1 }).limit(limit).skip(offset);
         } else {
-            categories = await Categories.find();
-        }
-
-        res.status(200).json(categories);
+            categories = await Categories.find().sort({ _id: -1 }).limit(limit).skip(offset);
+        
+        };
+      
+        res.status(200).json({totalPages: lastPage, currentPage: page, totalItems: countItem, categories});
     } catch (err) {
         console.error(err);
         res.status(500).json(err);

@@ -46,9 +46,26 @@ router.delete("/:id", verifyTokenAndAdmin, async (req, res) => {
 
 //GET USER ORDERS
 router.get("/user/:id", verifyTokenAndAuthorization, async (req, res) => {
+    //PAGINAÇÃO
+const {page = 1, limit = 5} = req.query;
+
+
+//CONTAR A QUANTIDADE DE REGISTROS NO BANCO DE DADOS
+const countItem = await Order.count();
+
+if(countItem !== 0){
+//CALCULA A ÚLTIMA PÁGINA
+lastPage = Math.ceil(countItem / limit);
+} else {
+    //PAUSA O PROCESSAMENTO E RETORNA MENSAGEM DE ERRO
+    return res.status(400).json("Error: Not order found!")
+}
+
+//CALCULAR A PARTIR DE QUAL REGISTRO DEVE RETORNAR O LIMITE DE REGISTROS
+const offset = Number((page * limit) - limit);
     try {
-        const orders = await Order.find({userId: req.params.id});
-        res.status(200).json(orders);
+        const orders = await Order.find().sort({ _id: -1 }).limit(limit).skip(offset);
+        res.status(200).json({totalPages: lastPage, currentPage: page, totalItems: countItem, orders});
     } catch (err) {
         res.status(500).json(err);
     }
