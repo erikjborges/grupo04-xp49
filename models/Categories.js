@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const CategoriesSchema = new mongoose.Schema(
     {
-        title: { type: String}
+        title: { type: String, required: true, unique: true }
         
     });
 
