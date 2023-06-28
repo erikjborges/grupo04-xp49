@@ -63,15 +63,16 @@ router.get("/", async (req, res) => {
     let countItem;
     if(qCategory){
         countItem = await Product.count({
-            categories: qCategory
-        });
+            categories: {$elemMatch: {_id: qCategory} },
+        }
+        );
     }else{
         countItem = await Product.count({
         
         });
     }
 //CALCULA A ÚLTIMA PÁGINA
-lastPage = Math.ceil(countItem / limit);
+const lastPage = Math.ceil(countItem / limit);
 
 
 //CALCULAR A PARTIR DE QUAL REGISTRO DEVE RETORNAR O LIMITE DE REGISTROS
@@ -82,7 +83,7 @@ const offset = Number((page * limit) - limit);
         if (qCategory) {
             products = await Product.find({
                 categories: {
-                    $in: [qCategory],
+                    $elemMatch: {_id: qCategory},
                 },
             }).sort({ _id: -1 }).limit(limit).skip(offset);
 
@@ -91,7 +92,7 @@ const offset = Number((page * limit) - limit);
            
         };
 
-        res.status(200).json({totalPages: lastPage, currentPage: page, totalItems: countItem, products});;
+        res.status(200).json({totalPages: lastPage, currentPage: page, totalItems: countItem, products});
     } catch (err) {
         console.error(err);
         res.status(500).json(err);
