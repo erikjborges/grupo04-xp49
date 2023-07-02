@@ -71,7 +71,7 @@ router.get("/", async (req, res) => {
          });
      }
  //CALCULA A ÚLTIMA PÁGINA
- lastPage = Math.ceil(countItem / limit);
+ const lastPage = Math.ceil(countItem / limit);
  //CALCULAR A PARTIR DE QUAL REGISTRO DEVE RETORNAR O LIMITE DE REGISTROS
 const offset = Number((page * limit) - limit);
 

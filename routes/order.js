@@ -51,20 +51,19 @@ const {page = 1, limit = 5} = req.query;
 
 
 //CONTAR A QUANTIDADE DE REGISTROS NO BANCO DE DADOS
-const countItem = await Order.count();
+const countItem = await Order.count({
+    userId: req.params.id,
+});
 
-if(countItem !== 0){
-//CALCULA A ÚLTIMA PÁGINA
-lastPage = Math.ceil(countItem / limit);
-} else {
-    //PAUSA O PROCESSAMENTO E RETORNA MENSAGEM DE ERRO
-    return res.status(400).json("Error: Not order found!")
-}
+const lastPage = Math.ceil(countItem / limit);
+
 
 //CALCULAR A PARTIR DE QUAL REGISTRO DEVE RETORNAR O LIMITE DE REGISTROS
 const offset = Number((page * limit) - limit);
     try {
-        const orders = await Order.find().sort({ _id: -1 }).limit(limit).skip(offset);
+        const orders = await Order.find({
+            userId: req.params.id,
+        }).sort({ _id: -1 }).limit(limit).skip(offset);
         res.status(200).json({totalPages: lastPage, currentPage: page, totalItems: countItem, orders});
     } catch (err) {
         res.status(500).json(err);
@@ -80,13 +79,8 @@ const {page = 1, limit = 5} = req.query;
 //CONTAR A QUANTIDADE DE REGISTROS NO BANCO DE DADOS
 const countItem = await Order.count();
 
-if(countItem !== 0){
 //CALCULA A ÚLTIMA PÁGINA
-lastPage = Math.ceil(countItem / limit);
-} else {
-    //PAUSA O PROCESSAMENTO E RETORNA MENSAGEM DE ERRO
-    return res.status(400).json("Error: Not order found!")
-}
+const lastPage = Math.ceil(countItem / limit);
 
 //CALCULAR A PARTIR DE QUAL REGISTRO DEVE RETORNAR O LIMITE DE REGISTROS
 const offset = Number((page * limit) - limit);
@@ -105,32 +99,6 @@ router.get("/:id", async (req, res) => {
         const order = await Order.findById(req.params.id);
         res.status(200).json(order);
     } catch (err) {
-        res.status(500).json(err);
-    }
-});
-
-//GET MONTHLY INCOME
-router.get("/income", verifyTokenAndAdmin, async (req,res)=>{
-const date = newDate();
-const lastMonth = new Date(date.setMonth(date.getMonth()-1));
-const previousMonth = new Date(new Date().setMonth(lastMonth.getMonth()-1));
-
-    try{
-const income = await Order.aggregate([
-    { $match: { createdAt: {$gte: previousMonth } } },
-    {
-        $project:{
-        month: {$month:"$createdAt"},
-        sales:"$amount",
-        },
-                    $group:{
-                _id:"$month",
-                total:{$sum: "$sales"},
-            },
-        },
-]);
-res.status(200).json(income);
-    } catch(err){
         res.status(500).json(err);
     }
 });

@@ -55,13 +55,9 @@ router.get("/", verifyTokenAndAdmin, async (req, res) => {
 //CONTAR A QUANTIDADE DE REGISTROS NO BANCO DE DADOS
 const countItem = await User.count();
 
-if(countItem !== 0){
+
 //CALCULA A ÚLTIMA PÁGINA
-lastPage = Math.ceil(countItem / limit);
-} else {
-    //PAUSA O PROCESSAMENTO E RETORNA MENSAGEM DE ERRO
-    return res.status(400).json("Error: Not users found!")
-}
+const lastPage = Math.ceil(countItem / limit);
 
 //CALCULAR A PARTIR DE QUAL REGISTRO DEVE RETORNAR O LIMITE DE REGISTROS
 const offset = Number((page * limit) - limit);
