@@ -4,6 +4,10 @@ A API foi escrita em linguagem JS(javaScript). Foram utilizadas as bibliotecas: 
 
 GitHub do projeto de front: https://github.com/rodrigobruno/desafio-4-grupo-4-front-end-ecommerce
 
+URL para consumo do APP: https://desafio-4-grupo-4-front-end-ecommerce.vercel.app/
+
+URL para consumo da API: https://grupo04-xp49-production.up.railway.app
+
 Abaixo estão os caminhos utilizados para realizar os testes da API:
 
 USER:
